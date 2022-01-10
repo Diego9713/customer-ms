@@ -32,8 +32,10 @@ public class Customer {
     private String phoneNumber;
     @Field(name = "civil_status")
     private String civilStatus;
+    @Field(name = "email")
     private String email;
     @Field(name = "is_owner")
     private boolean isOwner;
+    @Field(name = "status")
     private String status;
 }

@@ -2,6 +2,7 @@ package bootcamp.com.customerms.expose;
 
 import bootcamp.com.customerms.model.Customer;
 import bootcamp.com.customerms.business.ICustomerService;
+import bootcamp.com.customerms.model.CustomerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -17,30 +18,42 @@ public class CustomerController {
     private ICustomerService customerRepository;
 
     @GetMapping("")
-    public Flux<Customer> findAllCustomer(){
+    public Flux<CustomerDto> findAllCustomer(){
         return customerRepository.findAllCustomer();
     }
+
+    @GetMapping("/document-number/{id}")
+    public Mono<ResponseEntity<Customer>> findOneCustomerByDni(@PathVariable String id ){
+        return customerRepository.findByDocumentNumber(id)
+                .flatMap(p->Mono.just(ResponseEntity.ok().body(p)))
+                .switchIfEmpty(Mono.just(ResponseEntity.badRequest().build()));
+
+    }
+
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Customer>> findOneCustomer(@PathVariable String id){
+    public Mono<ResponseEntity<CustomerDto>> findOneCustomer(@PathVariable String id){
         return customerRepository.findByIdCustomer(id)
                 .flatMap(p->Mono.just(ResponseEntity.ok().body(p)))
                 .switchIfEmpty(Mono.just(ResponseEntity.badRequest().build()));
 
     }
+
     @PostMapping("")
-    public Mono<ResponseEntity<Customer>> saveCustomer(@RequestBody Customer customer){
+    public Mono<ResponseEntity<CustomerDto>> saveCustomer(@RequestBody Customer customer){
         return customerRepository.createCustomer(customer)
                 .flatMap(p->Mono.just(ResponseEntity.ok().body(p)))
                 .switchIfEmpty(Mono.just(ResponseEntity.badRequest().build()));
     }
+
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Customer>> updateCustomer(@PathVariable String id,@RequestBody Customer customer){
+    public Mono<ResponseEntity<CustomerDto>> updateCustomer(@PathVariable String id,@RequestBody Customer customer){
         return customerRepository.updateCustomer(customer,id)
                 .flatMap(p->Mono.just(ResponseEntity.ok().body(p)))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
+
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Customer>> removeCustomer(@PathVariable("id") String id){
+    public Mono<ResponseEntity<CustomerDto>> removeCustomer(@PathVariable("id") String id){
         return customerRepository.removeCustomer(id)
                 .flatMap(p->Mono.just(ResponseEntity.ok().body(p)))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
