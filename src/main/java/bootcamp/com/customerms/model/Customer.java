@@ -26,14 +26,18 @@ public class Customer {
     private String firstName;
     @Field(name = "last_name")
     private String lastName;
+    @Field(name = "address")
     private String address;
+    @Field(name = "references")
     private String references;
     @Field(name = "phone_number")
     private String phoneNumber;
     @Field(name = "civil_status")
     private String civilStatus;
+    @Field(name = "email")
     private String email;
     @Field(name = "is_owner")
     private boolean isOwner;
+    @Field(name = "status")
     private String status;
 }
