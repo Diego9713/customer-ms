@@ -26,7 +26,9 @@ public class Customer {
     private String firstName;
     @Field(name = "last_name")
     private String lastName;
+    @Field(name = "address")
     private String address;
+    @Field(name = "references")
     private String references;
     @Field(name = "phone_number")
     private String phoneNumber;
