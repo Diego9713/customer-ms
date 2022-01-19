@@ -6,16 +6,16 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ICustomerService {
-    Flux<CustomerDto> findAllCustomer();
+  Flux<CustomerDto> findAllCustomer();
 
-    Mono<CustomerDto> findByIdCustomer(String customerId);
+  Mono<CustomerDto> findByIdCustomer(String customerId);
 
-    Mono<Customer> findByDocumentNumber(String dni);
+  Mono<Customer> findByDocumentNumber(String dni);
 
-    Mono<CustomerDto> createCustomer(Customer customer);
+  Mono<CustomerDto> createCustomer(CustomerDto customer);
 
-    Mono<CustomerDto> updateCustomer(Customer customer, String customerId);
+  Mono<CustomerDto> updateCustomer(CustomerDto customer, String customerId);
 
-    Mono<CustomerDto> removeCustomer(String customerId);
+  Mono<CustomerDto> removeCustomer(String customerId);
 
 }
