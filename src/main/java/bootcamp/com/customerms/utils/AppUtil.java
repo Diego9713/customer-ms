@@ -4,6 +4,9 @@ import bootcamp.com.customerms.model.Customer;
 import bootcamp.com.customerms.model.CustomerDto;
 import org.springframework.beans.BeanUtils;
 
+/**
+ * Method to modify the customer attributes.
+ */
 public class AppUtil {
 
   private AppUtil() {
