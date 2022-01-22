@@ -7,7 +7,6 @@ import bootcamp.com.customerms.repository.ICustomerRepository;
 import bootcamp.com.customerms.utils.AppUtil;
 import bootcamp.com.customerms.utils.ConstantsCustomer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,12 +76,10 @@ public class CustomerService implements ICustomerService {
     return customerRepository.findByDocumentNumber(customer.getDocumentNumber())
       .switchIfEmpty(Mono.just(new Customer()))
       .filter(e -> e.getDocumentNumber() == null)
-      .doOnNext(p -> {
-        BeanUtils.copyProperties(customer, p);
-        p.setCustomerType(p.getCustomerType().toUpperCase());
-        p.setStatus(ConstantsCustomer.ACTIVE.name());
-      })
-      .flatMap(customerRepository::insert).map(AppUtil::entityToProductDto);
+      .flatMap(p -> AppUtil.createObjectCustomer(customer))
+      .map(AppUtil::productDtoToEntity)
+      .flatMap(customerRepository::save)
+      .map(AppUtil::entityToProductDto);
   }
 
   /**
@@ -98,12 +95,10 @@ public class CustomerService implements ICustomerService {
     log.info("update customer >>>");
     return customerRepository.findById(customerId)
       .switchIfEmpty(Mono.empty())
-      .doOnNext(p -> {
-        BeanUtils.copyProperties(customer, p);
-        p.setCustomerType(p.getCustomerType().toUpperCase());
-        p.setId(customerId);
-        p.setStatus(ConstantsCustomer.ACTIVE.name());
-      }).flatMap(customerRepository::save).map(AppUtil::entityToProductDto);
+      .flatMap(p -> AppUtil.updateObjectCustomer(customer, customerId))
+      .map(AppUtil::productDtoToEntity)
+      .flatMap(customerRepository::save)
+      .map(AppUtil::entityToProductDto);
   }
 
   /**
@@ -116,7 +111,8 @@ public class CustomerService implements ICustomerService {
   @Transactional
   public Mono<CustomerDto> removeCustomer(String customerId) {
     log.info("delete customer >>>");
-    return customerRepository.findById(customerId).switchIfEmpty(Mono.empty())
+    return customerRepository.findById(customerId)
+      .switchIfEmpty(Mono.empty())
       .doOnNext(p -> p.setStatus(ConstantsCustomer.INACTIVE.name()))
       .flatMap(customerRepository::save).map(AppUtil::entityToProductDto);
   }

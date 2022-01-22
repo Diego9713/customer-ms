@@ -24,11 +24,22 @@ public class CustomerController {
   @Qualifier("CustomerRepository")
   private ICustomerService customerService;
 
+  /**
+   * Method to find all customers.
+   *
+   * @return a list of clients.
+   */
   @GetMapping("")
   public Flux<CustomerDto> findAllCustomer() {
     return customerService.findAllCustomer();
   }
 
+  /**
+   * Method to search by document number.
+   *
+   * @param id -> is the identifier of the customer to search for.
+   * @return the wanted customer.
+   */
   @GetMapping("/documentnumber/{id}")
   public Mono<ResponseEntity<Customer>> findOneCustomerByDni(@PathVariable String id) {
     return customerService.findByDocumentNumber(id)
@@ -37,6 +48,12 @@ public class CustomerController {
 
   }
 
+  /**
+   * Method to search for a customer by id.
+   *
+   * @param id -> is the identifier of the customer.
+   * @return the wanted customer.
+   */
   @GetMapping("/{id}")
   public Mono<ResponseEntity<CustomerDto>> findOneCustomer(@PathVariable String id) {
     return customerService.findByIdCustomer(id)
@@ -45,6 +62,12 @@ public class CustomerController {
 
   }
 
+  /**
+   * Method to save a customer.
+   *
+   * @param customer -> It is a collection of customer data.
+   * @return the saved customer.
+   */
   @PostMapping("")
   public Mono<ResponseEntity<CustomerDto>> saveCustomer(@RequestBody CustomerDto customer) {
     return customerService.createCustomer(customer)
@@ -52,6 +75,13 @@ public class CustomerController {
       .switchIfEmpty(Mono.just(ResponseEntity.badRequest().build()));
   }
 
+  /**
+   * Method to update a customer.
+   *
+   * @param customer -> It is a collection of customer data.
+   * @param id       -> is the identifier of the customer.
+   * @return updated customer.
+   */
   @PutMapping("/{id}")
   public Mono<ResponseEntity<CustomerDto>> updateCustomer(@PathVariable String id, @RequestBody CustomerDto customer) {
     return customerService.updateCustomer(customer, id)
@@ -59,6 +89,12 @@ public class CustomerController {
       .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
   }
 
+  /**
+   * Method to change the customer state.
+   *
+   * @param id -> is the identifier of the customer.
+   * @return client with status change.
+   */
   @DeleteMapping("/{id}")
   public Mono<ResponseEntity<CustomerDto>> removeCustomer(@PathVariable("id") String id) {
     return customerService.removeCustomer(id)
