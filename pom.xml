@@ -192,7 +192,6 @@
                         <exclude>**/utils/*</exclude>
                         <exclude>**/model/*</exclude>
                         <exclude>**/config/*</exclude>
-                        <exclude>**/CustomerMsApplication.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -260,7 +259,6 @@
                         <exclude>**/utils/*</exclude>
                         <exclude>**/model/*</exclude>
                         <exclude>**/config/*</exclude>
-                        <exclude>**/CustomerMsApplication.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
