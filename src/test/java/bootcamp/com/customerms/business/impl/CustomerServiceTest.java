@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +35,7 @@ class CustomerServiceTest {
 
   public static MockWebServer mockBackEnd;
   private static final Customer customerMock = new Customer();
+  private static final Customer customerMockRemove = new Customer();
   private static final CustomerDto customerMockDto = new CustomerDto();
   private static final List<Customer> customerList = new ArrayList<>();
   private final static String id = "61db5ffd7610bd27a53b2b8b";
@@ -69,6 +69,7 @@ class CustomerServiceTest {
     customerMock.setStatus(status);
     customerList.add(customerMock);
     BeanUtils.copyProperties(customerMock, customerMockDto);
+    BeanUtils.copyProperties(customerMock, customerMockRemove);
     mockBackEnd = new MockWebServer();
     mockBackEnd.start(port);
   }
@@ -92,19 +93,37 @@ class CustomerServiceTest {
   @Test
   void findAllCustomer() {
     when(customerRepository.findAll()).thenReturn(Flux.fromIterable(customerList));
-    Assertions.assertNotNull(customerService.findAllCustomer());
+    Flux<CustomerDto> customerDtoFlux = customerService.findAllCustomer();
+    StepVerifier
+      .create(customerDtoFlux)
+      .consumeNextWith(newCustomer -> {
+        Assertions.assertEquals(status, newCustomer.getStatus());
+      })
+      .verifyComplete();
   }
 
   @Test
   void findByIdCustomer() {
     when(customerRepository.findById(id)).thenReturn(Mono.just(customerMock));
-    Assertions.assertNotNull(customerService.findByIdCustomer(id));
+    Mono<CustomerDto> customerDtoMono = customerService.findByIdCustomer(id);
+    StepVerifier
+      .create(customerDtoMono)
+      .consumeNextWith(newCustomer -> {
+        Assertions.assertEquals(ConstantsCustomer.ACTIVE.name(), newCustomer.getStatus());
+      })
+      .verifyComplete();
   }
 
   @Test
   void findByDocumentNumber() {
     when(customerRepository.findByDocumentNumber(documentNumber)).thenReturn(Mono.just(customerMock));
-    Assertions.assertNotNull(customerService.findByDocumentNumber(documentNumber));
+    Mono<Customer> customerDtoMono = customerService.findByDocumentNumber(documentNumber);
+    StepVerifier
+      .create(customerDtoMono)
+      .consumeNextWith(newCustomer -> {
+        Assertions.assertEquals(ConstantsCustomer.ACTIVE.name(), newCustomer.getStatus());
+      })
+      .verifyComplete();
   }
 
   @Test
@@ -112,19 +131,26 @@ class CustomerServiceTest {
     when(customerRepository.findByDocumentNumber(documentNumber)).thenReturn(Mono.just(new Customer()));
     when(customerRepository.save(customerMock)).thenReturn(Mono.just(customerMock));
     Assertions.assertNotNull(customerService.createCustomer(customerMockDto));
+
   }
 
   @Test
   void updateCustomer() {
     when(customerRepository.findById(id)).thenReturn(Mono.just(customerMock));
     when(customerRepository.save(customerMock)).thenReturn(Mono.just(customerMock));
-    Assertions.assertNotNull(customerService.updateCustomer(customerMockDto,id));
+    Assertions.assertNotNull(customerService.updateCustomer(customerMockDto, id));
   }
 
   @Test
   void removeCustomer() {
-    when(customerRepository.findById(id)).thenReturn(Mono.just(customerMock));
-    when(customerRepository.save(customerMock)).thenReturn(Mono.just(customerMock));
-    Assertions.assertNotNull(customerService.removeCustomer(id));
+    when(customerRepository.findById(id)).thenReturn(Mono.just(customerMockRemove));
+    when(customerRepository.save(customerMockRemove)).thenReturn(Mono.just(customerMockRemove));
+    Mono<CustomerDto> customerDtoMono = customerService.removeCustomer(id);
+    StepVerifier
+      .create(customerDtoMono)
+      .consumeNextWith(newCustomer -> {
+        Assertions.assertEquals(ConstantsCustomer.INACTIVE.name(), newCustomer.getStatus());
+      })
+      .verifyComplete();
   }
 }

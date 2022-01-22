@@ -71,17 +71,9 @@ class CustomerControllerTest {
 
   @Test
   @DisplayName("GET -> /api/v1/customers")
-  void byAll() {
-
+  void findAllCustomer() {
     when(customerService.findAllCustomer()).thenReturn(Flux.fromIterable(customerDtoList));
-
-    WebTestClient.ResponseSpec responseSpec = webTestClient.get().uri("/api/v1/customers")
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange();
-
-    responseSpec.expectStatus().isOk()
-      .expectHeader().contentType(MediaType.APPLICATION_JSON);
-
+    Assertions.assertNotNull(customerController.findAllCustomer());
   }
 
   @Test
